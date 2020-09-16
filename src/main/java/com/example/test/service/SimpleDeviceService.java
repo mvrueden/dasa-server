@@ -4,6 +4,7 @@ import com.example.test.model.Device;
 import com.example.test.model.DeviceFilter;
 import com.example.test.model.restriction.Restriction;
 import com.example.test.model.restriction.Restrictions;
+import com.example.test.rest.error.DeviceInUseException;
 import com.google.common.collect.Lists;
 import org.springframework.stereotype.Service;
 
@@ -78,7 +79,8 @@ public class SimpleDeviceService implements DeviceService {
     @Override
     public void unregisterDevice(Device device) {
         Objects.requireNonNull(device);
-        findById(device.getId()).ifPresent((theDevice) -> unregisterDevice(theDevice));
+        findById(device.getId()).ifPresent((theDevice) -> devices.remove(theDevice));
+        claims.entrySet().stream().filter(e -> e.getValue() == device).map(Map.Entry::getKey).forEach(claims::remove);
     }
 
     @Override
@@ -89,15 +91,16 @@ public class SimpleDeviceService implements DeviceService {
 
     @Override
     public Optional<SessionHandle> claimDevice(DeviceFilter deviceFilter) {
-        final Optional<Device> anyMatchingDevice = find(deviceFilter).stream()
-                .filter(device -> !this.claims.containsValue(device))
-                .findAny();
-        if (anyMatchingDevice.isPresent()) {
+        final List<Device> devices = find(deviceFilter);
+        if (!devices.isEmpty()) {
+            final Device availableDevice = devices.stream()
+                    .filter(device -> !this.claims.containsValue(device))
+                    .findAny()
+                    .orElseThrow(() -> new DeviceInUseException());
             final String sessionId = UUID.randomUUID().toString();
-            claims.put(sessionId, anyMatchingDevice.get());
-            return Optional.of(new SessionHandle(sessionId, anyMatchingDevice.get().getId()));
+            claims.put(sessionId, availableDevice);
+            return Optional.of(new SessionHandle(sessionId, availableDevice.getId()));
         }
-        // TODO MVR implement that devices already in use may be re-used if the same user requests it
         return Optional.empty();
     }
 

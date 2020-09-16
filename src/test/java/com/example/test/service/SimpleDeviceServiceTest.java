@@ -4,12 +4,11 @@ import com.example.test.model.Device;
 import com.example.test.model.DeviceFilter;
 import com.example.test.model.Status;
 import com.example.test.model.Type;
+import com.example.test.rest.error.DeviceInUseException;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.context.annotation.Import;
 
-import javax.annotation.PostConstruct;
 import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -17,23 +16,24 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.jupiter.api.Assertions.fail;
 
-@DataJpaTest
-@Import({
-        SimpleDeviceService.class,
-})
 public class SimpleDeviceServiceTest {
 
-    @Autowired
-    private DeviceService deviceService;
+    private DeviceService deviceService = new SimpleDeviceService();
 
-    @PostConstruct
+    @BeforeEach
     public void init() {
         deviceService.registerDevice(Device.builder()
                 .energy(1)
                 .id(1L).type(Type.Satellite)
                 .status(Status.WARNINGS)
                 .build());
+    }
+
+    @AfterEach
+    public void after() {
+        deviceService.findAll().forEach(deviceService::unregisterDevice);
     }
 
     @Test
@@ -46,9 +46,14 @@ public class SimpleDeviceServiceTest {
         assertThat(sessionHandle, notNullValue());
         assertThat(sessionHandle.getSessionId(), notNullValue());
 
-        // should fail
-        final Optional<SessionHandle> sessionHandle2 = deviceService.claimDevice(filter);
-        assertThat(sessionHandle2, is(Optional.empty()));
+        try {
+            // should fail
+            final Optional<SessionHandle> sessionHandle2 = deviceService.claimDevice(filter);
+            assertThat(sessionHandle2, is(Optional.empty()));
+            fail("Was expecting exception, which was not thrown"); // TODO MVR maybe use consumer construct
+        } catch (DeviceInUseException ex) {
+            // expected
+        }
 
         // Free device
         deviceService.clearDevice(sessionHandle.getSessionId());
