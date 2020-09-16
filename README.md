@@ -58,4 +58,19 @@ curl -X POST http://localhost:8080/devices/free/<sessionId>
 Always returns Status OK 200. TODO MVr should probably not be the case
 
 
+## Docker
 
+### Build everything:
+
+`mvn clean install`
+
+Optionally without tests
+`mvn clean install -DskipTests`
+
+### Build the Docker image
+
+`docker build . -t dasa/server:bleeding --build-arg JAR_FILE=dasa-0.0.1-SNAPSHOT.jar`
+
+### Run the container
+
+`docker run --rm -d -p 8080:8080 dasa/server:bleeding`
