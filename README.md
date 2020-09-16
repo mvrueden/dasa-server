@@ -59,7 +59,7 @@ curl -X POST http://localhost:8080/devices/free/<sessionId>
 
 **Response**
 
-Always returns Status OK 200. TODO MVr should probably not be the case
+For now, always returns HTTP Status OK 200, even if the provided sessionId is unknown.
 
 
 ## Docker

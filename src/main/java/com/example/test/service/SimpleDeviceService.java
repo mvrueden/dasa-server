@@ -90,7 +90,6 @@ public class SimpleDeviceService implements DeviceService {
     @Override
     public void clearDevice(String sessionId) {
         claims.remove(sessionId);
-
     }
 
     @Override
