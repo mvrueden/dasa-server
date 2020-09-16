@@ -1,0 +1,108 @@
+package com.example.test.service;
+
+import com.example.test.model.Device;
+import com.example.test.model.DeviceFilter;
+import com.example.test.model.restriction.Restriction;
+import com.example.test.model.restriction.Restrictions;
+import com.google.common.collect.Lists;
+import org.springframework.stereotype.Service;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
+
+@Service
+public class SimpleDeviceService implements DeviceService {
+
+    private final List<Device> devices = Lists.newCopyOnWriteArrayList();
+    private final Map<String, Device> claims = new ConcurrentHashMap<>();
+
+    @Override
+    public Optional<Device> findOne(DeviceFilter filter) {
+        Objects.requireNonNull(filter);
+        final List<Device> devices = find(filter);
+        if (devices.size() == 0) {
+            return Optional.empty();
+        }
+        // TODO MVR maybe add logging to indicate there are more than one matching, but only one is being returned
+        return Optional.of(devices.get(0));
+    }
+
+    @Override
+    public List<Device> find(DeviceFilter filter) {
+        Objects.requireNonNull(filter);
+        final List<Restriction> restrictions = Lists.newArrayList();
+        // TODO MVR make more dynamic... is very simple
+        if (filter.getEnergy() != null) {
+            restrictions.add(d -> d.getEnergy() == filter.getEnergy());
+        }
+        if (filter.getStatus() != null) {
+            restrictions.add(d -> d.getStatus() == filter.getStatus());
+        }
+        if (filter.getTyp() != null) {
+            restrictions.add(d -> d.getType() == filter.getTyp());
+        }
+        if (filter.getDeviceId() != null) {
+            restrictions.add(d -> Objects.equals(d.getId(), filter.getDeviceId()));
+        }
+        final Restriction restriction = Restrictions.and(restrictions);
+        final List<Device> matchingDevices = findAll().stream()
+                .filter(d -> restriction.matches(d))
+                .collect(Collectors.toUnmodifiableList());
+        return matchingDevices;
+    }
+
+    @Override
+    public Optional<Device> findById(long id) {
+        final DeviceFilter deviceFilter = DeviceFilter.builder().deviceId(id).build();
+        final Optional<Device> one = findOne(deviceFilter);
+        return one;
+    }
+
+    @Override
+    public void registerDevice(Device device) {
+        Objects.requireNonNull(device);
+        final Optional<Device> byId = findById(device.getId());
+        if (!byId.isPresent()) {
+            devices.add(device);
+        } else {
+            throw new IllegalStateException("Device already registered"); // TODO MVR maybe be a bit more gentle about this
+        }
+    }
+
+    @Override
+    public void unregisterDevice(Device device) {
+        Objects.requireNonNull(device);
+        findById(device.getId()).ifPresent((theDevice) -> unregisterDevice(theDevice));
+    }
+
+    @Override
+    public void clearDevice(String sessionId) {
+        claims.remove(sessionId);
+
+    }
+
+    @Override
+    public Optional<SessionHandle> claimDevice(DeviceFilter deviceFilter) {
+        final Optional<Device> anyMatchingDevice = find(deviceFilter).stream()
+                .filter(device -> !this.claims.containsValue(device))
+                .findAny();
+        if (anyMatchingDevice.isPresent()) {
+            final String sessionId = UUID.randomUUID().toString();
+            claims.put(sessionId, anyMatchingDevice.get());
+            return Optional.of(new SessionHandle(sessionId, anyMatchingDevice.get().getId()));
+        }
+        // TODO MVR implement that devices already in use may be re-used if the same user requests it
+        return Optional.empty();
+    }
+
+    @Override
+    public List<Device> findAll() {
+        return Collections.unmodifiableList(devices);
+    }
+}
