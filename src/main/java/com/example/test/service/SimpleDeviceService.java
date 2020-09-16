@@ -6,6 +6,7 @@ import com.example.test.model.restriction.Restriction;
 import com.example.test.model.restriction.Restrictions;
 import com.example.test.rest.error.DeviceInUseException;
 import com.google.common.collect.Lists;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -18,6 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class SimpleDeviceService implements DeviceService {
 
     private final List<Device> devices = Lists.newCopyOnWriteArrayList();
@@ -30,7 +32,9 @@ public class SimpleDeviceService implements DeviceService {
         if (devices.size() == 0) {
             return Optional.empty();
         }
-        // TODO MVR maybe add logging to indicate there are more than one matching, but only one is being returned
+        if (devices.size() > 1) {
+            log.debug("Query matched multiple devices. Devices matching: {}. Devices returning: {}. Determining Factor: First in List", devices.size(), 1);
+        }
         return Optional.of(devices.get(0));
     }
 
@@ -38,7 +42,7 @@ public class SimpleDeviceService implements DeviceService {
     public List<Device> find(DeviceFilter filter) {
         Objects.requireNonNull(filter);
         final List<Restriction> restrictions = Lists.newArrayList();
-        // TODO MVR make more dynamic... is very simple
+        // TODO MVR make more dynamic... is very simple and won't work anymore with database
         if (filter.getEnergy() != null) {
             restrictions.add(d -> d.getEnergy() == filter.getEnergy());
         }
@@ -72,7 +76,7 @@ public class SimpleDeviceService implements DeviceService {
         if (!byId.isPresent()) {
             devices.add(device);
         } else {
-            throw new IllegalStateException("Device already registered"); // TODO MVR maybe be a bit more gentle about this
+            log.warn("Device with id {} already registered.", device.getId());
         }
     }
 

@@ -36,13 +36,17 @@ In case the requested device is already claimed, a LOCKED http response is retur
 It accepts a filter object to filter which device should be claimed.
 Possible options are:
 
-**deviceId** Id of the device. By default a device with id 1 is registered
+**deviceId** Id of the device. 
+By default a device with id 1 is registered
 
-**typ** The type of the device. See TODO MVR
+**typ** The type of the device. 
+See [Type](blob/master/src/main/java/com/example/test/model/Type.java) for supported types. 
 
-**energy** The current energy level of the device. For now it must match exactly. Meaning a requested value of 0.5 will only return those, but not anything whith an energy level higher than the threshold
+**energy** The current energy level of the device. 
+For now it must match exactly, meaning a requested value of 0.5 will only return those, but not anything with an energy level higher than the provided threshold.
 
-**status** The status of the device. See TODO MVR
+**status** The status of the device. 
+See [Status](blob/master/src/main/java/com/example/test/model/Status.java) for supported status.
 
 If you provide more than one value, all filter criteria must match.
 
