@@ -4,7 +4,9 @@ import com.example.test.model.Device;
 import com.example.test.model.DeviceFilter;
 import com.example.test.model.Status;
 import com.example.test.model.Type;
+import com.example.test.rest.error.DeviceInUseException;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -43,16 +45,18 @@ public class SimpleDeviceServiceTest {
         final SessionHandle sessionHandle = deviceService.claimDevice(filter).get();
         assertThat(sessionHandle, notNullValue());
         assertThat(sessionHandle.getSessionId(), notNullValue());
-
     }
 
     @Test
     public void verifyClaimTwiceFails() {
         final DeviceFilter filter = DeviceFilter.builder().deviceId(1L).build();
-        final SessionHandle sessionHandle = deviceService.claimDevice(filter).get();
+        deviceService.claimDevice(filter).get();
+
         // should fail
-        final Optional<SessionHandle> sessionHandle2 = deviceService.claimDevice(filter);
-        assertThat(sessionHandle2, is(Optional.empty()));
+        Assertions.assertThrows(DeviceInUseException.class, () -> {
+            final Optional<SessionHandle> sessionHandle2 = deviceService.claimDevice(filter);
+            assertThat(sessionHandle2, is(Optional.empty()));
+        });
     }
 
     @Test
