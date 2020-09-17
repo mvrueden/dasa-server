@@ -1,8 +1,27 @@
-# DASA - New Horizons
+# DASA - Lift Off To New Horizons
 
 This is an example implementation of a very simple rest service.
 
+## Prerequisites
+
+1. JDK version >= 11 (tested with JDK 11.0.6)
+1. Maven version >= 3.6.0 (tested with 3.6.2)
+1. Docker (tested with 19.03.12 community edition)
+
+
 ## Build 
+
+**Clone the repository**
+
+Without SSH
+```
+git clone https://github.com/mvrueden/dasa-server.git
+```
+
+With SSH
+```
+git clone git@github.com:mvrueden/dasa-server.git
+```
 
 **Build with tests**
 
