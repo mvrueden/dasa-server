@@ -118,24 +118,15 @@ For now, always returns HTTP Status OK 200, even if the provided sessionId is un
 
 ## Docker
 
-### Build everything:
+Make sure that the source code is build, before building the docker image.
 
-```
-mvn clean package
-```
-
-Optionally without tests
-```
-mvn clean package -DskipTests
-```
-
-### Build the Docker image
+**Build the Docker image**
 
 ```
 docker build . -t dasa/server:bleeding --build-arg JAR_FILE=dasa-0.0.1-SNAPSHOT.jar
 ```
 
-### Run the container
+**Run the container**
 
 ```
 docker run --rm -d -p 8080:8080 dasa/server:bleeding
