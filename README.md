@@ -22,6 +22,16 @@ mvn clean package -DskipTests
 mvn test
 ```
 
+## Run Application
+
+Make sure the code was build, before trying to run the application.
+
+```
+java -jar target/dasa-0.0.1-SNAPSHOT.jar
+```
+
+Afterwards the API endpoints are available at `http://localhost:8080`.
+
 ## API Endpoints
 ### List devices
 
