@@ -53,7 +53,7 @@ curl -X GET http://localhost:8080/devices
 **Request**
 
 ```
-curl -X POST -H 'Content-Type: application/json' -d "{\typ\": \"Satellite\""}" http://localhost:8080/devices/claim
+curl -X POST -H 'Content-Type: application/json' -d "{\typ\": \"Satellite\"}" http://localhost:8080/devices/claim
 ```
 
 **Response**
