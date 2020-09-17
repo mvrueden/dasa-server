@@ -63,6 +63,7 @@ curl -X GET http://localhost:8080/devices
 **Response**
 
 ```
+200 OK 
 [{"id":1,"energy":1.0,"status":"NO_WARNING","type":"Satellite"}]
 ```
 
@@ -78,16 +79,27 @@ curl -X POST -H 'Content-Type: application/json' -d "{\"typ\": \"Satellite\"}" h
 **Response**
 
 ```
+200 OK 
 {"sessionId":"7abee89a-43ae-43ac-8f1d-e1d813389701","deviceId":1}
 ```
 
 
-In case the requested device is already claimed, a LOCKED http response is returned
+In case the requested device is already claimed, a 423 Locked http response is returned
 ```
+423 LOCKED
 {"status":"LOCKED","timestamp":[2020,9,16,14,33,21,708083000],"field":"device","message":"The requested device is already in use.","debugMessage":null}* Closing connection 0
 ```
 
-It accepts a filter object to filter which device should be claimed.
+If no device is matching the provided filter criteria (and was not claimed) a `204 No Content` is returned.
+
+In case the request is not valid (e.g. no filter criteria defined), a `400 Bad Request` is returned including an error message.
+```
+400 BAD REQUEST
+{"status":"BAD_REQUEST","timestamp":[2020,9,17,11,11,41,263158000],"field":"entity","message":"At least one filter criteria must be provided","debugMessage":null}%
+```
+
+This endpoint accepts a filter object to query a device which should be claimed.
+
 Possible options are:
 
 **deviceId** Id of the device. 
