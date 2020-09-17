@@ -4,13 +4,13 @@ This is an example implementation of a very simple rest service.
 
 ## Build 
 
-**Run with tests**
+**Build with tests**
 
 ```
 mvn clean package
 ```
 
-**Run without tests**
+**Build without tests**
 
 ```
 mvn clean package -DskipTests
