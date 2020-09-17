@@ -2,17 +2,42 @@
 
 This is an example implementation of a very simple rest service.
 
-## List devices
+## Build 
+
+**Run with tests**
+
+```
+mvn clean package
+```
+
+**Run without tests**
+
+```
+mvn clean package -DskipTests
+```
+
+## Run tests
+
+```
+mvn test
+```
+
+## API Endpoints
+### List devices
 
 **Request**
 
-`curl -X GET http://localhost:8080/devices`
+```
+curl -X GET http://localhost:8080/devices
+```
 
 **Response**
 
-`[{"id":1,"energy":1.0,"status":"NO_WARNING","type":"Satellite"}]`
+```
+[{"id":1,"energy":1.0,"status":"NO_WARNING","type":"Satellite"}]
+```
 
-## Claim session on existing device
+### Claim session on existing device
 
 
 **Request**
@@ -50,7 +75,7 @@ See [Status](blob/master/src/main/java/com/example/test/model/Status.java) for s
 
 If you provide more than one value, all filter criteria must match.
 
-## Free already claimed session
+### Free already claimed session
 
 **Request**
 ```
@@ -66,15 +91,23 @@ For now, always returns HTTP Status OK 200, even if the provided sessionId is un
 
 ### Build everything:
 
-`mvn clean install`
+```
+mvn clean package
+```
 
 Optionally without tests
-`mvn clean install -DskipTests`
+```
+mvn clean package -DskipTests
+```
 
 ### Build the Docker image
 
-`docker build . -t dasa/server:bleeding --build-arg JAR_FILE=dasa-0.0.1-SNAPSHOT.jar`
+```
+docker build . -t dasa/server:bleeding --build-arg JAR_FILE=dasa-0.0.1-SNAPSHOT.jar
+```
 
 ### Run the container
 
-`docker run --rm -d -p 8080:8080 dasa/server:bleeding`
+```
+docker run --rm -d -p 8080:8080 dasa/server:bleeding
+```
