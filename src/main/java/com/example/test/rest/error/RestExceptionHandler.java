@@ -45,9 +45,4 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return buildResponseEntity(error);
     }
 
-    @ExceptionHandler(ForbiddenException.class)
-    protected ResponseEntity<Object> handleException(ForbiddenException ex) {
-        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-    }
-
 }
