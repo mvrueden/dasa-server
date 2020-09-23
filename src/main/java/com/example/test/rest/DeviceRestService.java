@@ -28,6 +28,12 @@ public class DeviceRestService {
     @Autowired
     private DeviceService deviceService;
 
+    @PostMapping
+    public List<Device> find(@RequestBody DeviceFilter deviceFilter) {
+        validate(deviceFilter);
+        return deviceService.find(deviceFilter);
+    }
+
     @PostMapping("/claim")
     public ResponseEntity<SessionHandle> startSession(@RequestBody DeviceFilter deviceFilter) {
         validate(deviceFilter);
