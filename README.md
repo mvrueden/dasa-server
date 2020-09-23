@@ -67,6 +67,14 @@ curl -X GET http://localhost:8080/devices
 [{"id":1,"energy":1.0,"status":"NO_WARNING","type":"Satellite"}]
 ```
 
+Devices can be filtered using a device filter as body, e.g.
+
+```
+ curl -X POST -H 'Content-Type: application/json' -d "{\"energy\": 0.1}" http://localhost:8080/devices
+```
+
+See next chapter for more details on how filtering works.
+
 ### Claim session on existing device
 
 
