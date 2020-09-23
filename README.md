@@ -109,7 +109,8 @@ By default a device with id 1 is registered
 See [Type](blob/master/src/main/java/com/example/test/model/Type.java) for supported types. 
 
 **energy** The current energy level of the device. 
-For now it must match exactly, meaning a requested value of 0.5 will only return those, but not anything with an energy level higher than the provided threshold.
+Any device having an energy level greater or equal the provided value will be returned.
+E.g. when providing 0.5 anything from 0.5 to 1 will be returned (both values including).
 
 **status** The status of the device. 
 See [Status](blob/master/src/main/java/com/example/test/model/Status.java) for supported status.

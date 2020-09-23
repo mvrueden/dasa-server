@@ -44,7 +44,7 @@ public class SimpleDeviceService implements DeviceService {
         final List<Restriction> restrictions = Lists.newArrayList();
         // TODO MVR make more dynamic... is very simple and won't work anymore with database
         if (filter.getEnergy() != null) {
-            restrictions.add(d -> d.getEnergy() == filter.getEnergy());
+            restrictions.add(d -> d.getEnergy() >= filter.getEnergy());
         }
         if (filter.getStatus() != null) {
             restrictions.add(d -> d.getStatus() == filter.getStatus());
@@ -110,5 +110,10 @@ public class SimpleDeviceService implements DeviceService {
     @Override
     public List<Device> findAll() {
         return Collections.unmodifiableList(devices);
+    }
+
+    @Override
+    public long countAll() {
+        return devices.size();
     }
 }

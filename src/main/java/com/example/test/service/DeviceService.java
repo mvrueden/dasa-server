@@ -16,4 +16,5 @@ public interface DeviceService {
     void clearDevice(String sessionId);
     Optional<SessionHandle> claimDevice(DeviceFilter deviceFilter) throws DeviceInUseException;
     List<Device> findAll();
+    long countAll();
 }

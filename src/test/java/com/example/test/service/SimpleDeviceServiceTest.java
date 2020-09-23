@@ -1,5 +1,6 @@
 package com.example.test.service;
 
+import com.example.test.InitializeTestData;
 import com.example.test.model.Device;
 import com.example.test.model.DeviceFilter;
 import com.example.test.model.Status;
@@ -10,6 +11,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
 import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -23,13 +25,9 @@ public class SimpleDeviceServiceTest {
     private DeviceService deviceService = new SimpleDeviceService();
 
     @BeforeEach
-    public void init() {
-        // Register a device
-        deviceService.registerDevice(Device.builder()
-                .energy(1)
-                .id(1L).type(Type.Satellite)
-                .status(Status.WARNINGS)
-                .build());
+    public void init() throws IOException {
+        // Register devices
+        new InitializeTestData(deviceService).populateDatabase();
     }
 
     @AfterEach
@@ -40,7 +38,7 @@ public class SimpleDeviceServiceTest {
 
     @Test
     public void verifyClaim() {
-        assertThat(deviceService.findAll(), hasSize(1));
+        assertThat(deviceService.findAll(), hasSize(3));
         final DeviceFilter filter = DeviceFilter.builder().deviceId(1L).build();
         final SessionHandle sessionHandle = deviceService.claimDevice(filter).get();
         assertThat(sessionHandle, notNullValue());
@@ -74,11 +72,11 @@ public class SimpleDeviceServiceTest {
 
     @Test
     public void verifyFind() {
-        final DeviceFilter filter = DeviceFilter.builder().typ(Type.SpaceStation).build();
+        final DeviceFilter filter = DeviceFilter.builder().typ(Type.SpaceStation).energy(0.5f).build();
         assertThat(deviceService.find(filter), hasSize(0));
 
         final Device device = Device.builder()
-                .id(2L)
+                .id(deviceService.countAll() + 1)
                 .type(Type.SpaceStation)
                 .energy(0.5f)
                 .status(Status.NO_WARNING).build();
@@ -86,5 +84,21 @@ public class SimpleDeviceServiceTest {
 
         assertThat(deviceService.find(filter), hasSize(1));
         assertThat(deviceService.findOne(filter).get(), is(device));
+    }
+
+    @Test
+    public void verifyFindMultipleCriteria() {
+        assertThat(deviceService.find(DeviceFilter.builder()
+                .typ(Type.Satellite)
+                .energy(1.0f)
+                .status(Status.NO_WARNING).build()), hasSize(1));
+        assertThat(deviceService.find(DeviceFilter.builder()
+                .typ(Type.Satellite)
+                .energy(0.5f)
+                .status(Status.NO_WARNING).build()), hasSize(1));
+        assertThat(deviceService.find(DeviceFilter.builder()
+                .typ(Type.SpaceStation)
+                .energy(1f)
+                .status(Status.NO_WARNING).build()), hasSize(0));
     }
 }

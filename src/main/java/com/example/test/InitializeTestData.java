@@ -10,21 +10,34 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
+import java.util.Objects;
 
 @Component
 @Profile("!prod")
 public class InitializeTestData {
 
-    @Autowired
-    private DeviceService deviceService;
+    private final DeviceService deviceService;
+
+    public InitializeTestData(@Autowired DeviceService deviceService) {
+        this.deviceService = Objects.requireNonNull(deviceService);
+    }
 
     @PostConstruct
     public void populateDatabase() throws IOException {
         deviceService.registerDevice(Device.builder()
-                .id(1L)
-                .type(Type.Satellite)
-                .energy(1)
-                .status(Status.NO_WARNING).build());
+            .id(1L)
+            .type(Type.Satellite)
+            .energy(1)
+            .status(Status.NO_WARNING).build());
+        deviceService.registerDevice(Device.builder()
+            .id(2L)
+            .type(Type.SpaceStation)
+            .energy(0.1f)
+            .status(Status.NO_WARNING).build());
+        deviceService.registerDevice(Device.builder()
+            .id(3L)
+            .type(Type.Satellite)
+            .energy(0.5f)
+            .status(Status.WARNINGS).build());
     }
-
 }
