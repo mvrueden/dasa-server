@@ -56,7 +56,7 @@ public class DeviceRestServiceTest {
         given()
                 .log().ifValidationFails()
                 .contentType(ContentType.JSON)
-                .post("/devices/free/" + sessionHandle.getSessionId())
+                .delete("/devices/free/" + sessionHandle.getSessionId())
                 .then()
                 .statusCode(200);
     }

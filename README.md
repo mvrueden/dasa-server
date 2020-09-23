@@ -120,7 +120,7 @@ If you provide more than one value, all filter criteria must match.
 
 **Request**
 ```
-curl -X POST http://localhost:8080/devices/free/<sessionId>
+curl -X DELETE http://localhost:8080/devices/free/<sessionId>
 ```
 
 **Response**
